@@ -153,7 +153,7 @@
                             "• Wake time: 6:00 AM - 7:00 AM\n" +
                             "• Total sleep: 9-11 hours\n\n" +
                             "Evening routine:\n" +
-                            "7:00 PM - Dinner time 🍽\n" +
+                            "7:00 PM - Dinner time 🍽️\n" +
                             "7:30 PM - Fun quiet time (reading, coloring) 📚\n" +
                             "8:00 PM - Splash time 🛁\n" +
                             "8:30 PM - Story time 📖\n" +
@@ -168,7 +168,7 @@
                             "• Total sleep: 8-10 hours (fr fr you need this! 💯)\n\n" +
                             "Evening routine:\n" +
                             "8:00 PM - Time to ditch the phone (ik it's tough!) 📱\n" +
-                            "8:30 PM - Quick stretch or vibe check 🧘‍♂\n" +
+                            "8:30 PM - Quick stretch or vibe check 🧘‍♂️\n" +
                             "9:00 PM - Journal your thoughts or read smth cool 📖\n" +
                             "9:30 PM - Zen time (maybe some lofi beats?) 🎧\n" +
                             "10:00 PM - Hit the hay! 💤\n\n" +
@@ -183,7 +183,7 @@
                             "• Total sleep: 7-9 hours (no cap, you need this) 💯\n\n" +
                             "Evening routine:\n" +
                             "9:00 PM - Digital detox (Netflix will still be there tmrw) 🌅\n" +
-                            "9:30 PM - Quick stretch (your body will thank you later) 🧘‍♀\n" +
+                            "9:30 PM - Quick stretch (your body will thank you later) 🧘‍♀️\n" +
                             "10:00 PM - Read or meditate (whatever helps you decompress) 📚\n" +
                             "10:30 PM - Get ready for those Z's 😴\n" +
                             "11:00 PM - Time to crash! 💤\n\n" +
@@ -197,10 +197,10 @@
                             "• Wake time: 5:00 AM - 6:00 AM\n" +
                             "• Total sleep: 7-8 hours\n\n" +
                             "Evening routine:\n" +
-                            "7:30 PM - Evening stroll in the garden 🚶‍♂\n" +
-                            "8:00 PM - Light supper 🍽\n" +
+                            "7:30 PM - Evening stroll in the garden 🚶‍♂️\n" +
+                            "8:00 PM - Light supper 🍽️\n" +
                             "8:30 PM - Relaxing activities (puzzles, reading) 📖\n" +
-                            "9:00 PM - Gentle stretches 🧘‍♂\n" +
+                            "9:00 PM - Gentle stretches 🧘‍♂️\n" +
                             "9:30 PM - Sweet dreams 🌙"
                 }
             }
@@ -263,7 +263,7 @@
         function addMessage(message, isUser = false) {
             const chatBody = document.getElementById('chatBody');
             const messageDiv = document.createElement('div');
-            messageDiv.className = message ${isUser ? 'user-message' : 'bot-message'};
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             messageDiv.textContent = message;
             chatBody.appendChild(messageDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
