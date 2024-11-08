@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiseWise - Sleep Routine Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            background-color: #16213e;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-header {
+            background-color: #0f3460;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .chat-body {
+            height: 60vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .user-message {
+            background-color: #e94560;
+            margin-left: auto;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .bot-message {
+            background-color: #0f3460;
+            margin-right: auto;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .input-area {
+            padding: 20px;
+            background-color: #16213e;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e94560;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #16213e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0f3460;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🌙 RiseWise Sleep Assistant</h1>
+            <p>Your personal sleep routine advisor</p>
+        </div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send 📤</button>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            greeting: [
+                "Yo! What's good? 👋", 
+                "Hey there! Ready to level up your sleep game? 🌟", 
+                "Hi bestie! Let's get you that beauty sleep! ✨",
+                "Sup! Let's talk sleep schedules! 🌙"
+            ],
+            introduction: [
+                "I'm RiseWise, your go-to sleep guru! 🌙 Drop your age or vibe, and I'll hook you up with the perfect sleep schedule! 💫",
+                "Heyyy! RiseWise here - your personal sleep coach! Tell me your age group and let's get you that quality rest! ✨"
+            ],
+            fallback: [
+                "Ngl, I'm a bit confused rn. Could you rephrase that? 🤔",
+                "That's not really my jam. Mind trying again? 💭",
+                "Bestie, I'm not quite following. Can you say that differently? 🌟"
+            ],
+            ageRoutines: {
+                child: {
+                    range: "5-12",
+                    slangTerms: ["kid", "kiddo", "child", "elementary", "primary school", "grade school", "young"],
+                    routine: "🌟 Cool Kid Sleep Schedule (Ages 5-12):\n\n" +
+                            "• Bedtime: 8:00 PM - 9:00 PM\n" +
+                            "• Wake time: 6:00 AM - 7:00 AM\n" +
+                            "• Total sleep: 9-11 hours\n\n" +
+                            "Evening routine:\n" +
+                            "7:00 PM - Dinner time 🍽️\n" +
+                            "7:30 PM - Chill time (reading, quiet play) 📚\n" +
+                            "8:00 PM - Bath time 🛁\n" +
+                            "8:30 PM - Story time 📖\n" +
+                            "9:00 PM - Sweet dreams! 💫"
+                },
+                teen: {
+                    range: "13-17",
+                    slangTerms: ["teen", "teenager", "highschool", "high school", "adolescent", "young adult", "tween", "middle school", "freshman", "sophomore", "junior", "senior", "gen z", "genz"],
+                    routine: "🌟 Teen Sleep Guide (Fr fr no cap):\n\n" +
+                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
+                            "• Wake time: 6:30 AM - 7:30 AM\n" +
+                            "• Total sleep: 8-10 hours (trust the process)\n\n" +
+                            "The vibe check:\n" +
+                            "8:00 PM - Phone down bestie, no cap 📱\n" +
+                            "8:30 PM - Quick stretch or vibe sesh 🧘‍♂️\n" +
+                            "9:00 PM - Journal your thoughts or read smth 📖\n" +
+                            "9:30 PM - Meditation time (low key important) 🌙\n" +
+                            "10:00 PM - Time to crash! ✨"
+                },
+                adult: {
+                    range: "18-64",
+                    slangTerms: ["grown up", "grown-up", "adult", "working", "millennial", "professional", "mid", "middle age", "midlife", "working professional", "corporate", "twenty", "thirty", "forty", "fifty", "60s"],
+                    routine: "🌟 Adult Sleep Routine (Because adulting is hard):\n\n" +
+                            "• Bedtime: 10:00 PM - 11:00 PM\n" +
+                            "• Wake time: 6:00 AM - 7:00 AM\n" +
+                            "• Total sleep: 7-9 hours (we know you need it)\n\n" +
+                            "The wind-down:\n" +
+                            "9:00 PM - Digital detox (Netflix can wait) 🌅\n" +
+                            "9:30 PM - Quick yoga or stretching (your back will thank you) 🧘‍♀️\n" +
+                            "10:00 PM - Read or meditate (self-care queen/king) 📚\n" +
+                            "10:30 PM - Get ready for bed (skincare routine maybe?) 🌙\n" +
+                            "11:00 PM - Time to catch those Zs! ✨"
+                },
+                senior: {
+                    range: "65+",
+                    slangTerms: ["senior", "elderly", "retired", "golden years", "silver", "boomer", "baby boomer", "retirement", "mature"],
+                    routine: "🌟 Golden Years Sleep Guide:\n\n" +
+                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
+                            "• Wake time: 5:00 AM - 6:00 AM\n" +
+                            "• Total sleep: 7-8 hours\n\n" +
+                            "Evening routine:\n" +
+                            "7:30 PM - Evening stroll (perfect for digestion) 🚶‍♂️\n" +
+                            "8:00 PM - Light dinner 🍽️\n" +
+                            "8:30 PM - Relaxation time (puzzles or reading) 📖\n" +
+                            "9:00 PM - Gentle stretching 🧘‍♂️\n" +
+                            "9:30 PM - Sweet dreams! 🌙"
+                }
+            }
+        };
+
+        function getRandomResponse(responseArray) {
+            return responseArray[Math.floor(Math.random() * responseArray.length)];
+        }
+
+        function detectIntent(message) {
+            message = message.toLowerCase();
+            
+            if (message.includes('hello') || message.includes('hi') || message.includes('hey') || message.includes('sup')) {
+                return 'greeting';
+            }
+            
+            if (message.includes('who are you') || message.includes('what are you') || message.includes('introduce')) {
+                return 'introduction';
+            }
+            
+            // Check for age-related terms and slang
+            for (let ageGroup in responses.ageRoutines) {
+                const terms = responses.ageRoutines[ageGroup].slangTerms;
+                if (terms.some(term => message.includes(term))) {
+                    return ageGroup;
+                }
+            }
+            
+            // Check for numeric age
+            if (message.includes('age') || message.match(/\d+/)) {
+                const age = parseInt(message.match(/\d+/));
+                if (age) {
+                    if (age < 13) return 'child';
+                    if (age < 18) return 'teen';
+                    if (age < 65) return 'adult';
+                    return 'senior';
+                }
+            }
+            
+            return 'fallback';
+        }
+
+        function getResponse(message) {
+            const intent = detectIntent(message);
+            
+            switch(intent) {
+                case 'greeting':
+                    return getRandomResponse(responses.greeting);
+                case 'introduction':
+                    return getRandomResponse(responses.introduction);
+                case 'child':
+                case 'teen':
+                case 'adult':
+                case 'senior':
+                    return responses.ageRoutines[intent].routine;
+                default:
+                    return getRandomResponse(responses.fallback);
+            }
+        }
+
+        function addMessage(message, isUser = false) {
+            const chatBody = document.getElementById('chatBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                const response = getResponse(message);
+                setTimeout(() => addMessage(response), 500);
+                input.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Initial greeting
+        window.onload = () => {
+            setTimeout(() => addMessage("Heyyy bestie! 👋 RiseWise here - your sleep routine bestie! Drop your age or vibe, and I'll hook you up with the perfect sleep schedule! ✨"), 500);
+        };
+    </script>
+</body>
+</html>
