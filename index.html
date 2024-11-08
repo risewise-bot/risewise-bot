@@ -9,111 +9,96 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: #1a1a2e;
             color: #e6e6e6;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 2rem;
+            padding: 20px;
         }
 
-        .container {
+        .chat-container {
             max-width: 800px;
+            margin: 0 auto;
             width: 100%;
             background-color: #16213e;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .chat-header {
             background-color: #0f3460;
-            padding: 1.5rem;
+            padding: 20px;
             text-align: center;
-            border-bottom: 2px solid #1a1a2e;
         }
 
         .chat-header h1 {
-            font-size: 1.5rem;
-            color: #e6e6e6;
-            margin-bottom: 0.5rem;
+            font-size: 24px;
+            color: #e94560;
+            margin-bottom: 10px;
         }
 
-        .chat-header p {
-            font-size: 0.9rem;
-            color: #b4b4b4;
-        }
-
-        .chat-messages {
-            height: 400px;
+        .chat-body {
+            height: 60vh;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 20px;
         }
 
         .message {
-            margin-bottom: 1rem;
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
+            margin-bottom: 15px;
             max-width: 80%;
-            animation: fadeIn 0.3s ease-in-out;
+            padding: 12px 15px;
+            border-radius: 15px;
             line-height: 1.5;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .bot-message {
-            background-color: #0f3460;
-            margin-right: auto;
+            white-space: pre-wrap;
         }
 
         .user-message {
             background-color: #e94560;
             margin-left: auto;
-            color: white;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .bot-message {
+            background-color: #0f3460;
+            margin-right: auto;
+            border-radius: 15px 15px 15px 0;
         }
 
         .input-area {
-            padding: 1.5rem;
+            padding: 20px;
             background-color: #16213e;
-            border-top: 2px solid #1a1a2e;
             display: flex;
-            gap: 1rem;
+            gap: 10px;
         }
 
         input {
             flex: 1;
-            padding: 0.8rem;
+            padding: 12px;
             border: none;
             border-radius: 8px;
             background-color: #1a1a2e;
             color: #e6e6e6;
-            font-size: 1rem;
-        }
-
-        input:focus {
-            outline: 2px solid #e94560;
+            font-size: 16px;
         }
 
         button {
-            padding: 0.8rem 1.5rem;
+            padding: 12px 25px;
             border: none;
             border-radius: 8px;
             background-color: #e94560;
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: opacity 0.3s;
         }
 
         button:hover {
-            background-color: #d64161;
+            opacity: 0.9;
         }
 
         ::-webkit-scrollbar {
@@ -121,7 +106,7 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #1a1a2e;
+            background: #16213e;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -131,169 +116,180 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="chat-container">
         <div class="chat-header">
             <h1>🌙 RiseWise Sleep Assistant</h1>
-            <p>Your personal sleep routine advisor ✨</p>
+            <p>Your personal sleep routine advisor</p>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-body" id="chatBody"></div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your message here... 💭">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">Send 📤</button>
         </div>
     </div>
 
     <script>
         const responses = {
-            welcome: [
-                "👋 Hello! I'm RiseWise, your sleep routine advisor. To get started, please tell me your age! 🌟",
-                "✨ Hi there! I'm here to help you develop a healthy sleep routine. What's your age? 🤔",
-                "🌙 Welcome to RiseWise! I can help you create the perfect sleep schedule. First, I need to know your age! 💫"
+            greeting: [
+                "Yo! What's good? 👋", 
+                "Hey there! Ready to level up your sleep game? 🌟", 
+                "Welcome to RiseWise! Let's get you sorted! ✨"
             ],
-            greetings: {
-                patterns: ['hello', 'hi', 'hey', 'good morning', 'good evening', 'good afternoon'],
-                responses: [
-                    "👋 Hello! How can I help you with your sleep routine today? 🌙",
-                    "✨ Hi there! Ready to improve your sleep schedule? 💤",
-                    "🌟 Hey! Let's work on getting you better sleep! 😊"
-                ]
-            },
-            ageGroups: {
+            introduction: [
+                "Sup! I'm RiseWise, your sleep routine bestie! 🌙 Tell me your age or vibe, and I'll hook you up with the perfect sleep schedule! 💫",
+                "Hey fam! RiseWise here to help you catch those Z's! 😴 Drop your age and let's create your ideal sleep routine! ✨"
+            ],
+            fallback: [
+                "Oof, my bad! Could you rephrase that? 🤔", 
+                "Ngl, I'm a bit confused. Mind trying that again? 💭",
+                "That went over my head! Let's try again? 😅"
+            ],
+            ageRoutines: {
                 child: {
-                    range: [5, 12],
-                    sleepDuration: "9-11 hours 💫",
-                    routine: [
-                        "🛏️ Bedtime: 8:00 PM - 9:00 PM",
-                        "🌅 Wake time: 6:00 AM - 7:00 AM",
-                        "📱 No screen time 1 hour before bed",
-                        "📖 Light reading or calm activities before sleep",
-                        "🛁 Consistent bedtime routine including bath and storytime"
-                    ]
+                    range: "5-12",
+                    slangTerms: ["kid", "kiddo", "child", "elementary", "primary school", "grade school", "young"],
+                    routine: "🌟 Cool Kid's Sleep Schedule (Ages 5-12):\n\n" +
+                            "• Bedtime: 8:00 PM - 9:00 PM\n" +
+                            "• Wake time: 6:00 AM - 7:00 AM\n" +
+                            "• Total sleep: 9-11 hours\n\n" +
+                            "Evening routine:\n" +
+                            "7:00 PM - Dinner time 🍽\n" +
+                            "7:30 PM - Fun quiet time (reading, coloring) 📚\n" +
+                            "8:00 PM - Splash time 🛁\n" +
+                            "8:30 PM - Story time 📖\n" +
+                            "9:00 PM - Sweet dreams 💫"
                 },
                 teen: {
-                    range: [13, 17],
-                    sleepDuration: "8-10 hours 💫",
-                    routine: [
-                        "🛏️ Bedtime: 9:00 PM - 10:00 PM",
-                        "🌅 Wake time: 6:00 AM - 7:00 AM",
-                        "📱 Limit screen time after 8 PM",
-                        "🧘‍♂️ Cool down period with light stretching",
-                        "☕ No caffeine after 2 PM"
-                    ]
+                    range: "13-17",
+                    slangTerms: ["teen", "teenager", "high school", "highschool", "freshman", "sophomore", "junior", "senior", "young adult", "middle school", "adolescent"],
+                    routine: "🌟 Teen Sleep Guide (Ages 13-17):\n\n" +
+                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
+                            "• Wake time: 6:30 AM - 7:30 AM\n" +
+                            "• Total sleep: 8-10 hours (fr fr you need this! 💯)\n\n" +
+                            "Evening routine:\n" +
+                            "8:00 PM - Time to ditch the phone (ik it's tough!) 📱\n" +
+                            "8:30 PM - Quick stretch or vibe check 🧘‍♂\n" +
+                            "9:00 PM - Journal your thoughts or read smth cool 📖\n" +
+                            "9:30 PM - Zen time (maybe some lofi beats?) 🎧\n" +
+                            "10:00 PM - Hit the hay! 💤\n\n" +
+                            "Pro tip: Your TikTok feed can wait till tomorrow, bestie! 😉"
                 },
                 adult: {
-                    range: [18, 64],
-                    sleepDuration: "7-9 hours 💫",
-                    routine: [
-                        "🛏️ Bedtime: 10:00 PM - 11:00 PM",
-                        "🌅 Wake time: 6:00 AM - 7:00 AM",
-                        "🏃‍♂️ Evening workout completed by 7 PM",
-                        "🧘‍♀️ Meditation or relaxation exercises",
-                        "🌙 Create a calm sleep environment"
-                    ]
+                    range: "18-64",
+                    slangTerms: ["grown up", "grown-up", "working", "college", "uni", "university", "professional", "millennial", "gen z", "zoomer", "gen x", "worker"],
+                    routine: "🌟 Adulting Sleep Guide (Ages 18-64):\n\n" +
+                            "• Bedtime: 10:00 PM - 11:00 PM\n" +
+                            "• Wake time: 6:00 AM - 7:00 AM\n" +
+                            "• Total sleep: 7-9 hours (no cap, you need this) 💯\n\n" +
+                            "Evening routine:\n" +
+                            "9:00 PM - Digital detox (Netflix will still be there tmrw) 🌅\n" +
+                            "9:30 PM - Quick stretch (your body will thank you later) 🧘‍♀\n" +
+                            "10:00 PM - Read or meditate (whatever helps you decompress) 📚\n" +
+                            "10:30 PM - Get ready for those Z's 😴\n" +
+                            "11:00 PM - Time to crash! 💤\n\n" +
+                            "Pro tip: That 'one more episode' isn't worth tomorrow's meetings! 😉"
                 },
                 senior: {
-                    range: [65, 120],
-                    sleepDuration: "7-8 hours 💫",
-                    routine: [
-                        "🛏️ Bedtime: 9:00 PM - 10:00 PM",
-                        "🌅 Wake time: 5:00 AM - 6:00 AM",
-                        "🚶‍♂️ Light evening walk after dinner",
-                        "📖 Relaxing activities like reading or listening to calm music",
-                        "🍽️ Avoid heavy meals close to bedtime"
-                    ]
+                    range: "65+",
+                    slangTerms: ["elderly", "retired", "senior citizen", "golden years", "mature", "older adult", "retiree"],
+                    routine: "🌟 Golden Years Sleep Guide (Ages 65+):\n\n" +
+                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
+                            "• Wake time: 5:00 AM - 6:00 AM\n" +
+                            "• Total sleep: 7-8 hours\n\n" +
+                            "Evening routine:\n" +
+                            "7:30 PM - Evening stroll in the garden 🚶‍♂\n" +
+                            "8:00 PM - Light supper 🍽\n" +
+                            "8:30 PM - Relaxing activities (puzzles, reading) 📖\n" +
+                            "9:00 PM - Gentle stretches 🧘‍♂\n" +
+                            "9:30 PM - Sweet dreams 🌙"
                 }
-            },
-            fallback: [
-                "🤔 I'm not sure I understand. Could you rephrase that?",
-                "😅 I didn't quite catch that. Could you say it differently?",
-                "🌱 I'm still learning! Could you try asking in another way?"
-            ],
-            tips: [
-                "💡 Did you know? A dark room helps produce melatonin, the sleep hormone!",
-                "💡 Regular exercise can help you sleep better at night!",
-                "💡 Try to avoid caffeine at least 6 hours before bedtime!"
-            ]
+            }
         };
-
-        let userAge = null;
 
         function getRandomResponse(responseArray) {
             return responseArray[Math.floor(Math.random() * responseArray.length)];
         }
 
-        function addMessage(message, isUser = false) {
-            const chatMessages = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-            messageDiv.textContent = message;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function determineAgeGroup(age) {
-            for (const [group, data] of Object.entries(responses.ageGroups)) {
-                if (age >= data.range[0] && age <= data.range[1]) {
-                    return { group, data };
-                }
-            }
-            return null;
-        }
-
-        function processAge(age) {
-            const ageNum = parseInt(age);
-            if (isNaN(ageNum)) {
-                return "⚠️ Please enter a valid age number.";
+        function detectIntent(message) {
+            message = message.toLowerCase();
+            
+            // Check for greetings
+            if (message.match(/\b(hello|hi|hey|sup|yo|what'?s?\s*up|wassup)\b/)) {
+                return 'greeting';
             }
             
-            const ageGroup = determineAgeGroup(ageNum);
-            if (!ageGroup) {
-                return "⚠️ Please enter a valid age between 5 and 120.";
+            // Check for introduction requests
+            if (message.match(/\b(who are you|what are you|introduce|tell me about yourself)\b/)) {
+                return 'introduction';
             }
-
-            userAge = ageNum;
-            return `✨ Based on your age (${ageNum}), here's your recommended sleep routine:\n\n` +
-                   `🌙 Recommended sleep duration: ${ageGroup.data.sleepDuration}\n\n` +
-                   `Your personalized routine:\n${ageGroup.data.routine.join('\n')}\n\n` +
-                   `${getRandomResponse(responses.tips)}`;
+            
+            // Check for age groups and slang terms
+            for (const [group, data] of Object.entries(responses.ageRoutines)) {
+                if (data.slangTerms.some(term => message.includes(term))) {
+                    return group;
+                }
+            }
+            
+            // Check for numeric age
+            const age = parseInt(message.match(/\d+/));
+            if (age) {
+                if (age < 13) return 'child';
+                if (age < 18) return 'teen';
+                if (age < 65) return 'adult';
+                return 'senior';
+            }
+            
+            return 'fallback';
         }
 
-        function processMessage(message) {
-            const lowerMessage = message.toLowerCase();
-            if (responses.greetings.patterns.some(pattern => lowerMessage.includes(pattern))) {
-                return getRandomResponse(responses.greetings.responses);
+        function getResponse(message) {
+            const intent = detectIntent(message);
+            
+            switch(intent) {
+                case 'greeting':
+                    return getRandomResponse(responses.greeting);
+                case 'introduction':
+                    return getRandomResponse(responses.introduction);
+                case 'child':
+                case 'teen':
+                case 'adult':
+                case 'senior':
+                    return responses.ageRoutines[intent].routine;
+                default:
+                    return getRandomResponse(responses.fallback);
             }
+        }
 
-            const ageMatch = message.match(/\d+/);
-            if (ageMatch) {
-                return processAge(ageMatch[0]);
-            }
-
-            return getRandomResponse(responses.fallback);
+        function addMessage(message, isUser = false) {
+            const chatBody = document.getElementById('chatBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = message ${isUser ? 'user-message' : 'bot-message'};
+            messageDiv.textContent = message;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
 
         function sendMessage() {
-            const input = document.getElementById('user-input');
+            const input = document.getElementById('userInput');
             const message = input.value.trim();
             
             if (message) {
                 addMessage(message, true);
-                const response = processMessage(message);
+                const response = getResponse(message);
                 setTimeout(() => addMessage(response), 500);
                 input.value = '';
             }
         }
 
-        document.getElementById('user-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
                 sendMessage();
             }
-        });
+        }
 
+        // Initial greeting
         window.onload = () => {
-            setTimeout(() => {
-                addMessage(getRandomResponse(responses.welcome));
-            }, 500);
+            setTimeout(() => addMessage("Heyyy! 👋 RiseWise here, your sleep routine bestie! Drop your age or vibe, and I'll hook you up with the perfect sleep schedule! ✨"), 500);
         };
     </script>
 </body>
