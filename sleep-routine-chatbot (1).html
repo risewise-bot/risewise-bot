@@ -15,7 +15,7 @@
         body {
             background-color: #1a1a2e;
             color: #e6e6e6;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             padding: 20px;
@@ -29,6 +29,9 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
         }
 
         .chat-header {
@@ -44,7 +47,7 @@
         }
 
         .chat-body {
-            height: 60vh;
+            flex-grow: 1;
             overflow-y: auto;
             padding: 20px;
         }
@@ -123,141 +126,76 @@
         </div>
         <div class="chat-body" id="chatBody"></div>
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="if(event.key === 'Enter') sendMessage()">
             <button onclick="sendMessage()">Send 📤</button>
         </div>
     </div>
 
     <script>
-        const responses = {
-            greeting: [
-                "Yo! What's good? 👋", 
-                "Hey there! Ready to level up your sleep game? 🌟", 
-                "Hi bestie! Let's get you that beauty sleep! ✨",
-                "Sup! Let's talk sleep schedules! 🌙"
-            ],
-            introduction: [
-                "I'm RiseWise, your go-to sleep guru! 🌙 Drop your age or vibe, and I'll hook you up with the perfect sleep schedule! 💫",
-                "Heyyy! RiseWise here - your personal sleep coach! Tell me your age group and let's get you that quality rest! ✨"
-            ],
-            fallback: [
-                "Ngl, I'm a bit confused rn. Could you rephrase that? 🤔",
-                "That's not really my jam. Mind trying again? 💭",
-                "Bestie, I'm not quite following. Can you say that differently? 🌟"
-            ],
-            ageRoutines: {
-                child: {
-                    range: "5-12",
-                    slangTerms: ["kid", "kiddo", "child", "elementary", "primary school", "grade school", "young"],
-                    routine: "🌟 Cool Kid Sleep Schedule (Ages 5-12):\n\n" +
-                            "• Bedtime: 8:00 PM - 9:00 PM\n" +
-                            "• Wake time: 6:00 AM - 7:00 AM\n" +
-                            "• Total sleep: 9-11 hours\n\n" +
-                            "Evening routine:\n" +
-                            "7:00 PM - Dinner time 🍽️\n" +
-                            "7:30 PM - Chill time (reading, quiet play) 📚\n" +
-                            "8:00 PM - Bath time 🛁\n" +
-                            "8:30 PM - Story time 📖\n" +
-                            "9:00 PM - Sweet dreams! 💫"
-                },
-                teen: {
-                    range: "13-17",
-                    slangTerms: ["teen", "teenager", "highschool", "high school", "adolescent", "young adult", "tween", "middle school", "freshman", "sophomore", "junior", "senior", "gen z", "genz"],
-                    routine: "🌟 Teen Sleep Guide (Fr fr no cap):\n\n" +
-                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
-                            "• Wake time: 6:30 AM - 7:30 AM\n" +
-                            "• Total sleep: 8-10 hours (trust the process)\n\n" +
-                            "The vibe check:\n" +
-                            "8:00 PM - Phone down bestie, no cap 📱\n" +
-                            "8:30 PM - Quick stretch or vibe sesh 🧘‍♂️\n" +
-                            "9:00 PM - Journal your thoughts or read smth 📖\n" +
-                            "9:30 PM - Meditation time (low key important) 🌙\n" +
-                            "10:00 PM - Time to crash! ✨"
-                },
-                adult: {
-                    range: "18-64",
-                    slangTerms: ["grown up", "grown-up", "adult", "working", "millennial", "professional", "mid", "middle age", "midlife", "working professional", "corporate", "twenty", "thirty", "forty", "fifty", "60s"],
-                    routine: "🌟 Adult Sleep Routine (Because adulting is hard):\n\n" +
-                            "• Bedtime: 10:00 PM - 11:00 PM\n" +
-                            "• Wake time: 6:00 AM - 7:00 AM\n" +
-                            "• Total sleep: 7-9 hours (we know you need it)\n\n" +
-                            "The wind-down:\n" +
-                            "9:00 PM - Digital detox (Netflix can wait) 🌅\n" +
-                            "9:30 PM - Quick yoga or stretching (your back will thank you) 🧘‍♀️\n" +
-                            "10:00 PM - Read or meditate (self-care queen/king) 📚\n" +
-                            "10:30 PM - Get ready for bed (skincare routine maybe?) 🌙\n" +
-                            "11:00 PM - Time to catch those Zs! ✨"
-                },
-                senior: {
-                    range: "65+",
-                    slangTerms: ["senior", "elderly", "retired", "golden years", "silver", "boomer", "baby boomer", "retirement", "mature"],
-                    routine: "🌟 Golden Years Sleep Guide:\n\n" +
-                            "• Bedtime: 9:00 PM - 10:00 PM\n" +
-                            "• Wake time: 5:00 AM - 6:00 AM\n" +
-                            "• Total sleep: 7-8 hours\n\n" +
-                            "Evening routine:\n" +
-                            "7:30 PM - Evening stroll (perfect for digestion) 🚶‍♂️\n" +
-                            "8:00 PM - Light dinner 🍽️\n" +
-                            "8:30 PM - Relaxation time (puzzles or reading) 📖\n" +
-                            "9:00 PM - Gentle stretching 🧘‍♂️\n" +
-                            "9:30 PM - Sweet dreams! 🌙"
-                }
+        const botResponses = {
+            teen: {
+                keywords: ["teen", "teenager", "high school", "highschool", "freshman", "sophomore", "13", "14", "15", "16", "17"],
+                response: `✨ Teen Sleep Guide (Fr fr no cap):
+
+• Bedtime: 9:00 PM - 10:00 PM
+• Wake time: 6:30 AM - 7:30 AM
+• Total sleep needed: 8-10 hours
+
+Evening Routine:
+8:00 PM - Put that phone down bestie 📱
+8:30 PM - Vibe check/stretch session 🧘‍♂️
+9:00 PM - Maybe read something or journal your thoughts 📖
+9:30 PM - Quick meditation (trust the process) 🌙
+10:00 PM - Time to crash! 💫`
+            },
+            adult: {
+                keywords: ["adult", "working", "millennial", "professional", "20", "25", "30", "35", "40", "45", "50", "55", "60"],
+                response: `✨ Adult Sleep Guide (Because adulting is hard):
+
+• Bedtime: 10:00 PM - 11:00 PM
+• Wake time: 6:00 AM - 7:00 AM
+• Total sleep needed: 7-9 hours
+
+Evening Routine:
+9:00 PM - Digital detox (the emails can wait) 📱
+9:30 PM - Quick yoga/stretch (your back will thank you) 🧘‍♀️
+10:00 PM - Self-care time (read/meditate) 📚
+10:30 PM - Skincare routine maybe? 🌙
+11:00 PM - Sweet dreams! ✨`
+            },
+            greetings: {
+                keywords: ["hi", "hello", "hey", "sup", "yo"],
+                response: "Heyyy! 👋 I'm RiseWise, your sleep bestie! Tell me your age or vibe, and I'll hook you up with the perfect sleep schedule! ✨"
+            },
+            about: {
+                keywords: ["who are you", "what are you", "what do you do", "introduce"],
+                response: "I'm RiseWise, your personal sleep coach! 🌟 I help people get their sleep schedule on point! Just tell me your age or vibe, and I'll create a custom routine for you! 💫"
             }
         };
 
-        function getRandomResponse(responseArray) {
-            return responseArray[Math.floor(Math.random() * responseArray.length)];
-        }
-
-        function detectIntent(message) {
+        function findResponse(message) {
             message = message.toLowerCase();
             
-            if (message.includes('hello') || message.includes('hi') || message.includes('hey') || message.includes('sup')) {
-                return 'greeting';
+            // Check for age numbers first
+            const age = parseInt(message.match(/\d+/));
+            if (age) {
+                if (age >= 13 && age <= 17) return botResponses.teen.response;
+                if (age >= 18 && age <= 64) return botResponses.adult.response;
             }
-            
-            if (message.includes('who are you') || message.includes('what are you') || message.includes('introduce')) {
-                return 'introduction';
-            }
-            
-            // Check for age-related terms and slang
-            for (let ageGroup in responses.ageRoutines) {
-                const terms = responses.ageRoutines[ageGroup].slangTerms;
-                if (terms.some(term => message.includes(term))) {
-                    return ageGroup;
-                }
-            }
-            
-            // Check for numeric age
-            if (message.includes('age') || message.match(/\d+/)) {
-                const age = parseInt(message.match(/\d+/));
-                if (age) {
-                    if (age < 13) return 'child';
-                    if (age < 18) return 'teen';
-                    if (age < 65) return 'adult';
-                    return 'senior';
-                }
-            }
-            
-            return 'fallback';
-        }
 
-        function getResponse(message) {
-            const intent = detectIntent(message);
-            
-            switch(intent) {
-                case 'greeting':
-                    return getRandomResponse(responses.greeting);
-                case 'introduction':
-                    return getRandomResponse(responses.introduction);
-                case 'child':
-                case 'teen':
-                case 'adult':
-                case 'senior':
-                    return responses.ageRoutines[intent].routine;
-                default:
-                    return getRandomResponse(responses.fallback);
+            // Check for keywords
+            for (let category in botResponses) {
+                if (botResponses[category].keywords) {
+                    for (let keyword of botResponses[category].keywords) {
+                        if (message.includes(keyword)) {
+                            return botResponses[category].response;
+                        }
+                    }
+                }
             }
+
+            // Default response if no matches
+            return "Hey bestie! 🤔 Not sure what you mean. Can you tell me your age or if you're a teen/adult? I'll hook you up with the perfect sleep routine! ✨";
         }
 
         function addMessage(message, isUser = false) {
@@ -275,21 +213,17 @@
             
             if (message) {
                 addMessage(message, true);
-                const response = getResponse(message);
+                const response = findResponse(message);
                 setTimeout(() => addMessage(response), 500);
                 input.value = '';
             }
         }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
         // Initial greeting
         window.onload = () => {
-            setTimeout(() => addMessage("Heyyy bestie! 👋 RiseWise here - your sleep routine bestie! Drop your age or vibe, and I'll hook you up with the perfect sleep schedule! ✨"), 500);
+            setTimeout(() => {
+                addMessage("Heyyy bestie! 👋 I'm RiseWise, your sleep routine coach! Tell me your age or if you're a teen/adult, and I'll hook you up with the perfect sleep schedule! ✨");
+            }, 500);
         };
     </script>
 </body>
