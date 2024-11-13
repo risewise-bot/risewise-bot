@@ -133,6 +133,23 @@
 
     <script>
         const botResponses = {
+            child: {
+                keywords: ["child", "kid", "young", "elementary", "school", "6", "7", "8", "9", "10", "11", "12"],
+                response: `✨ Children's Sleep Guide (Fun bedtime adventure!):
+
+• Bedtime: 8:00 PM - 9:00 PM
+• Wake time: 7:00 AM - 8:00 AM
+• Total sleep needed: 9-11 hours
+
+Evening Routine:
+7:00 PM - Dinner time! 🍽️
+7:30 PM - Bath time splash! 🛁
+7:45 PM - PJ party time! 👕
+8:00 PM - Storytime adventure 📚
+8:30 PM - Cuddle with favorite plushie 🧸
+8:45 PM - Gentle lullaby or white noise 🎵
+9:00 PM - Dreamland awaits! 💫`
+            },
             teen: {
                 keywords: ["teen", "teenager", "high school", "highschool", "freshman", "sophomore", "13", "14", "15", "16", "17"],
                 response: `✨ Teen Sleep Guide (Fr fr no cap):
@@ -165,11 +182,11 @@ Evening Routine:
             },
             greetings: {
                 keywords: ["hi", "hello", "hey", "sup", "yo"],
-                response: "Heyyy! 👋 I'm RiseWise, your sleep bestie! Tell me your age or vibe, and I'll hook you up with the perfect sleep schedule! ✨"
+                response: "Heyyy! 👋 I'm RiseWise, your sleep bestie! Tell me your age or if you're a child/teen/adult, and I'll hook you up with the perfect sleep schedule! ✨"
             },
             about: {
                 keywords: ["who are you", "what are you", "what do you do", "introduce"],
-                response: "I'm RiseWise, your personal sleep coach! 🌟 I help people get their sleep schedule on point! Just tell me your age or vibe, and I'll create a custom routine for you! 💫"
+                response: "I'm RiseWise, your personal sleep coach! 🌟 I help people of all ages get their sleep schedule on point! Just tell me your age or if you're a child/teen/adult, and I'll create a custom routine for you! 💫"
             }
         };
 
@@ -179,6 +196,7 @@ Evening Routine:
             // Check for age numbers first
             const age = parseInt(message.match(/\d+/));
             if (age) {
+                if (age >= 6 && age <= 12) return botResponses.child.response;
                 if (age >= 13 && age <= 17) return botResponses.teen.response;
                 if (age >= 18 && age <= 64) return botResponses.adult.response;
             }
@@ -195,7 +213,7 @@ Evening Routine:
             }
 
             // Default response if no matches
-            return "Hey bestie! 🤔 Not sure what you mean. Can you tell me your age or if you're a teen/adult? I'll hook you up with the perfect sleep routine! ✨";
+            return "Hey bestie! 🤔 Not sure what you mean. Can you tell me your age or if you're a child/teen/adult? I'll hook you up with the perfect sleep routine! ✨";
         }
 
         function addMessage(message, isUser = false) {
@@ -222,7 +240,7 @@ Evening Routine:
         // Initial greeting
         window.onload = () => {
             setTimeout(() => {
-                addMessage("Heyyy bestie! 👋 I'm RiseWise, your sleep routine coach! Tell me your age or if you're a teen/adult, and I'll hook you up with the perfect sleep schedule! ✨");
+                addMessage("Heyyy bestie! 👋 I'm RiseWise, your sleep routine coach! Tell me your age or if you're a child/teen/adult, and I'll hook you up with the perfect sleep schedule! ✨");
             }, 500);
         };
     </script>
